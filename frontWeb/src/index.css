@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Palette DutCh’M : or du logo sur fond blanc */
+  --cream: 252 250 245;
+  --ivory: 255 255 255;
+  --sand: 242 233 214;
+  --gold-light: 245 214 123;
+  --gold: 212 161 42;
+  --gold-dark: 154 103 18;
+  --blush: 248 236 204;
+  --rose: 230 190 90;
+  --rose-dark: 176 124 30;
+  --ink: 43 33 21;
+  --ink-soft: 115 99 75;
+  --success: 110 159 123;
+  --warning: 224 138 40;
+  --danger: 192 100 92;
+  --gold-gradient: linear-gradient(135deg, #f2cf62 0%, #d4a12a 50%, #9a6712 100%);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply min-h-screen bg-cream font-sans text-ink;
+  }
+  h1, h2, h3 {
+    @apply font-serif font-semibold text-ink;
+  }
+  :focus-visible {
+    @apply outline-none ring-2 ring-gold ring-offset-2 ring-offset-cream;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+  .section-title {
+    @apply font-serif text-2xl font-bold uppercase tracking-section sm:text-3xl;
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .btn {
+    @apply inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition duration-200 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn text-white shadow-soft hover:-translate-y-0.5 hover:brightness-95;
+    background: var(--gold-gradient);
+  }
+  .btn-secondary {
+    @apply btn border border-gold bg-transparent text-gold-dark hover:bg-gold/10;
+  }
+  .btn-ghost {
+    @apply btn text-ink-soft hover:bg-sand;
+  }
+  .card {
+    @apply rounded-xl bg-ivory shadow-soft;
+  }
+  .input {
+    @apply min-h-[44px] w-full rounded-xl border border-sand bg-white px-4 py-2.5 text-sm text-ink placeholder:text-ink-soft/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-ink;
+  }
+  .field-error {
+    @apply mt-1 text-xs text-danger;
+  }
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .prose-amoria h2 {
+    @apply mb-2 mt-6 text-xl;
+  }
+  .prose-amoria p {
+    @apply mb-3 leading-relaxed text-ink;
+  }
+  .prose-amoria ul {
+    @apply mb-3 list-disc pl-5;
+  }
+  .prose-amoria ol {
+    @apply mb-3 list-decimal pl-5;
+  }
+  .prose-amoria a {
+    @apply text-gold-dark underline;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Back-office : variantes compactes des classes composants, scopées sous .admin-scope */
+@layer components {
+  .admin-scope .btn {
+    @apply inline-flex min-h-[38px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .admin-scope .btn-primary {
+    @apply inline-flex min-h-[38px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-soft transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50;
+    background: var(--gold-gradient);
+  }
+  .admin-scope .btn-secondary {
+    @apply inline-flex min-h-[38px] items-center justify-center gap-2 rounded-lg border border-gold/50 bg-transparent px-4 py-2 text-sm font-semibold text-gold-dark transition hover:bg-gold/10 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .admin-scope .btn-ghost {
+    @apply inline-flex min-h-[38px] items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold text-ink-soft transition hover:bg-sand disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .admin-scope .btn-danger {
+    @apply inline-flex min-h-[38px] items-center justify-center gap-2 rounded-lg bg-danger px-4 py-2 text-sm font-semibold text-white transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .admin-scope .card {
+    @apply rounded-xl border border-sand/60 bg-white shadow-soft;
+  }
+  .admin-scope .input {
+    @apply min-h-[38px] w-full rounded-lg border border-sand bg-white px-3 py-2 text-sm text-ink placeholder:text-ink-soft/70 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/30;
+  }
+  .admin-scope .label {
+    @apply mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-soft;
+  }
+  .admin-scope .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold;
+  }
+  .admin-scope .th {
+    @apply whitespace-nowrap px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-ink-soft;
+  }
+  .admin-scope .td {
+    @apply px-3 py-2.5 text-sm;
+  }
+}
