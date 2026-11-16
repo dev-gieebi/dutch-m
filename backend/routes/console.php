@@ -1,10 +1,31 @@
 <?php
 
+use App\Models\AdminUser;
 use App\Services\Arrivals\ArrivalsService;
+use App\Services\Auth\AdminAuthService;
 use App\Services\Catalog\ProductIndexer;
 use App\Services\Notifications\NotificationsService;
 use App\Services\Payments\PaymentsService;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+
+// Réinitialise le mot de passe d'un administrateur (et le déverrouille) : php artisan admin:reset-password email@exemple.com
+Artisan::command('admin:reset-password {email}', function (string $email) {
+    $user = AdminUser::where('email', strtolower(trim($email)))->first();
+    if (! $user) {
+        $this->error("Aucun administrateur avec l'adresse {$email}");
+
+        return 1;
+    }
+    $password = $this->secret('Nouveau mot de passe (8 caractères minimum)');
+    if (strlen((string) $password) < 8) {
+        $this->error('Mot de passe trop court');
+
+        return 1;
+    }
+    $user->update(['password_hash' => AdminAuthService::hashPassword($password), 'is_active' => true, 'failed_attempts' => 0, 'locked_until' => null]);
+    $this->info("✓ Mot de passe réinitialisé pour {$user->email}");
+})->purpose("Réinitialise le mot de passe d'un administrateur");
 
 /*
 | Tâches planifiées : `php artisan schedule:work` en développement,

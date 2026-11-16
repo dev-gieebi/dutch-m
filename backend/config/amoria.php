@@ -64,6 +64,7 @@ return [
     'seed_admin' => [
         'full_name' => env('SEED_ADMIN_FULL_NAME', 'Super admin DutCh’M'),
         'email' => env('SEED_ADMIN_EMAIL', 'superadmin@amoria.ga'),
-        'password' => env('SEED_ADMIN_PASSWORD', '12345678'),
+        // « ?: » : une variable présente mais vide dans le .env ne doit pas créer un mot de passe vide.
+        'password' => env('SEED_ADMIN_PASSWORD') ?: '12345678',
     ],
 ];

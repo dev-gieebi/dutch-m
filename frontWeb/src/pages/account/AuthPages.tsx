@@ -1,5 +1,5 @@
 import { AdminProfile, CustomerProfile, normalizeGabonPhone } from '@/shared';
-import { Flower2, KeyRound, MailCheck, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Flower2, KeyRound, MailCheck, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 import { Link, Route, Routes, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore as useAdminAuthStore } from '@/admin/store/auth';
@@ -33,6 +33,7 @@ function Login() {
   const setSession = useAuthStore((s) => s.setSession);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [state, setState] = useState<{ loading?: boolean; error?: string }>({});
   const [admin2fa, setAdmin2fa] = useState<{ tempToken: string; qr?: string; secret?: string } | null>(null);
   const [code, setCode] = useState('');
@@ -116,14 +117,15 @@ function Login() {
           <input className="input" value={identifier} onChange={(e) => setIdentifier(e.target.value)} autoComplete="username" placeholder="+241… ou vous@exemple.com" required />
         </Field>
         <Field label="Mot de passe">
-          <input className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+          <div className="relative">
+            <input className="input pr-11" type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="current-password" required />
+            <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-ink-soft hover:text-ink" aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            </button>
+          </div>
         </Field>
         {state.error && <Alert tone="error">{state.error}</Alert>}
         <button className="btn-primary w-full" disabled={state.loading}>{state.loading ? <Spinner /> : 'Se connecter'}</button>
-        <div className="flex justify-between text-sm">
-          <Link to="/compte/mot-de-passe-oublie" className="text-gold-dark hover:underline">Mot de passe oublié ?</Link>
-          <Link to={`/compte/inscription${params.get('redirect') ? `?redirect=${params.get('redirect')}` : ''}`} className="text-gold-dark hover:underline">Créer un compte</Link>
-        </div>
       </form>
     </Shell>
   );

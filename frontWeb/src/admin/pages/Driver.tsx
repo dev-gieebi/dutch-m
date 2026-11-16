@@ -5,12 +5,7 @@ import { useRef, useState } from 'react';
 import { Alert, Badge, EmptyState, Field, Modal, PageLoader } from '@/admin/components/ui';
 import { api, assetUrl, errorMessage } from '@/admin/lib/api';
 import { useUiStore } from '@/admin/store/ui';
-import { PlanningShipment } from './types';
-
-interface DriverDelivery extends PlanningShipment {
-  cashToCollect: number;
-  itemsSummary: string;
-}
+import { deliveryAddress, deliveryItemsSummary, DeliveryRow as DriverDelivery } from './types';
 
 export default function Driver() {
   const qc = useQueryClient();
@@ -24,7 +19,7 @@ export default function Driver() {
   const { data, isLoading } = useQuery({ queryKey: ['driver-deliveries', date], queryFn: () => api<DriverDelivery[]>('/admin/driver/deliveries', { query: { date } }) });
 
   const complete = useMutation({
-    mutationFn: (b: Record<string, unknown>) => api(`/admin/driver/deliveries/${target!.id}/complete`, { method: 'POST', body: b }),
+    mutationFn: (b: Record<string, unknown>) => api(`/admin/driver/deliveries/${target!.shipmentId}/complete`, { method: 'POST', body: b }),
     onSuccess: () => { notify('Livraison confirmée — merci !'); setTarget(null); setError(null); qc.invalidateQueries({ queryKey: ['driver-deliveries'] }); },
     onError: (e) => setError(errorMessage(e)),
   });
@@ -66,20 +61,21 @@ export default function Driver() {
       ) : (
         <div className="grid gap-3">
           {data.map((s) => (
-            <div key={s.id} className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
+            <div key={s.shipmentId} className="card flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
               <div className="min-w-0 flex-1">
                 <p className="font-mono text-xs font-semibold text-gold-dark">{s.orderNumber}</p>
-                <p className="font-semibold">{s.contactName} · <a className="text-gold-dark" href={`tel:${s.contactPhone}`}>{formatPhone(s.contactPhone)}</a></p>
-                <p className="text-sm text-ink-soft"><MapPin className="mr-1 inline h-4 w-4" />{s.address}</p>
-                {s.itemsSummary && <p className="mt-1 text-xs text-ink-soft">{s.itemsSummary}</p>}
-                {s.cashToCollect > 0 && <p className="mt-1 text-sm font-semibold text-warning">À encaisser : {formatFCFA(s.cashToCollect)}</p>}
+                <p className="font-semibold">{s.customerName} · <a className="text-gold-dark" href={`tel:${s.phone}`}>{formatPhone(s.phone)}</a></p>
+                <a href={s.mapsUrl} target="_blank" rel="noreferrer" className="block text-sm text-ink-soft hover:underline"><MapPin className="mr-1 inline h-4 w-4" />{deliveryAddress(s)}</a>
+                {s.instructions && <p className="mt-1 text-xs italic text-ink-soft">{s.instructions}</p>}
+                {s.items.length > 0 && <p className="mt-1 text-xs text-ink-soft">{deliveryItemsSummary(s)}</p>}
+                {s.amountToCollect > 0 && <p className="mt-1 text-sm font-semibold text-warning">À encaisser : {formatFCFA(s.amountToCollect)}</p>}
               </div>
               <div className="flex items-center gap-2">
                 {s.currentStep && <Badge tone="gold">{STEP_LABELS[s.currentStep]}</Badge>}
                 {s.deliveredAt ? (
                   <Badge tone="success"><CheckCircle2 className="h-3.5 w-3.5" /> Livrée</Badge>
                 ) : (
-                  <button className="btn-primary !min-h-[40px] text-sm" onClick={() => { setTarget(s); setForm({ code: '', cashAmount: s.cashToCollect ? String(s.cashToCollect) : '', cashMethod: 'CASH', cashReference: '', comment: '', proofUrl: null }); setError(null); }}>Terminer</button>
+                  <button className="btn-primary !min-h-[40px] text-sm" onClick={() => { setTarget(s); setForm({ code: '', cashAmount: s.amountToCollect ? String(s.amountToCollect) : '', cashMethod: 'CASH', cashReference: '', comment: '', proofUrl: null }); setError(null); }}>Terminer</button>
                 )}
               </div>
             </div>
@@ -92,9 +88,9 @@ export default function Driver() {
           <Field label="Code de remise (4 chiffres remis au client)" hint="Le client a reçu ce code par e-mail / SMS.">
             <input className="input text-center font-mono text-2xl tracking-[0.5em]" inputMode="numeric" maxLength={4} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value.replace(/\D/g, '') })} autoFocus />
           </Field>
-          {!!target?.cashToCollect && (
+          {!!target?.amountToCollect && (
             <div className="grid gap-3 rounded-lg bg-warning/10 p-3 sm:grid-cols-2">
-              <Field label={`Montant encaissé (${formatFCFA(target.cashToCollect)} attendus)`}>
+              <Field label={`Montant encaissé (${formatFCFA(target.amountToCollect)} attendus)`}>
                 <input className="input" inputMode="numeric" value={form.cashAmount} onChange={(e) => setForm({ ...form, cashAmount: e.target.value.replace(/\D/g, '') })} />
               </Field>
               <Field label="Moyen">

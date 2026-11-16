@@ -7,7 +7,7 @@ import { Alert, Badge, DataTable, Field, Modal, PageLoader } from '@/admin/compo
 import { api, errorMessage } from '@/admin/lib/api';
 import { hasPermission, useAuthStore } from '@/admin/store/auth';
 import { useUiStore } from '@/admin/store/ui';
-import { Planning } from './types';
+import { deliveryAddress, PlanningGroup } from './types';
 
 interface ZoneRow extends DeliveryZoneDto { estimatedDays: number; isActive: boolean; sortOrder: number }
 
@@ -21,7 +21,7 @@ export default function PlanningPage() {
   const [zoneForm, setZoneForm] = useState<(typeof emptyZone) & { id?: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { data: planning, isLoading } = useQuery({ queryKey: ['planning', date], queryFn: () => api<Planning>('/admin/deliveries/planning', { query: { date } }) });
+  const { data: planning, isLoading } = useQuery({ queryKey: ['planning', date], queryFn: () => api<PlanningGroup[]>('/admin/deliveries/planning', { query: { date } }) });
   const { data: zones } = useQuery({ queryKey: ['zones-admin'], queryFn: () => api<ZoneRow[]>('/admin/delivery/zones') });
   const canWrite = hasPermission(user, Permission.DELIVERY_WRITE);
 
@@ -44,30 +44,30 @@ export default function PlanningPage() {
       </div>
       {isLoading ? <PageLoader /> : (
         <div className="grid gap-4 lg:grid-cols-2">
-          {planning?.drivers.map(({ driver, shipments }) => (
-            <div key={driver?.id ?? 'none'} className="card p-4">
+          {planning?.map(({ driverId, driverName, deliveries }) => (
+            <div key={driverId ?? 'none'} className="card p-4">
               <h2 className="mb-3 flex items-center justify-between font-semibold">
-                {driver ? driver.fullName : 'Non affectées'}
-                <Badge tone="gold">{shipments.length} tournée{shipments.length > 1 ? 's' : ''}</Badge>
+                {driverId ? driverName : 'Non affectées'}
+                <Badge tone="gold">{deliveries.length} tournée{deliveries.length > 1 ? 's' : ''}</Badge>
               </h2>
-              {shipments.length ? (
+              {deliveries.length ? (
                 <ul className="space-y-2">
-                  {shipments.map((s) => (
-                    <li key={s.id} className="flex items-center gap-3 rounded-lg border border-sand p-3 text-sm">
+                  {deliveries.map((s) => (
+                    <li key={s.shipmentId} className="flex items-center gap-3 rounded-lg border border-sand p-3 text-sm">
                       <div className="min-w-0 flex-1">
                         <Link to={`/admin/commandes/${s.orderId}`} className="font-mono text-xs font-semibold text-gold-dark hover:underline">{s.orderNumber}</Link>
-                        <p className="font-medium">{s.contactName} · <a href={`tel:${s.contactPhone}`} className="text-gold-dark">{formatPhone(s.contactPhone)}</a></p>
-                        <p className="truncate text-xs text-ink-soft"><MapPin className="mr-1 inline h-3 w-3" />{s.address}</p>
+                        <p className="font-medium">{s.customerName} · <a href={`tel:${s.phone}`} className="text-gold-dark">{formatPhone(s.phone)}</a></p>
+                        <p className="truncate text-xs text-ink-soft"><MapPin className="mr-1 inline h-3 w-3" />{deliveryAddress(s)}</p>
                         {s.deliveredAt && <Badge tone="success">Livrée</Badge>}
                       </div>
-                      <Badge tone="muted">{s.deliveryCode}</Badge>
+                      {s.currentStepLabel && <Badge tone="muted">{s.currentStepLabel}</Badge>}
                     </li>
                   ))}
                 </ul>
               ) : <p className="text-sm text-ink-soft">Aucune livraison planifiée.</p>}
             </div>
           ))}
-          {planning && !planning.drivers.length && <Alert tone="info"><CalendarDays className="mr-1 inline h-4 w-4" /> Aucune livraison à domicile planifiée pour cette date.</Alert>}
+          {planning && !planning.length && <Alert tone="info"><CalendarDays className="mr-1 inline h-4 w-4" /> Aucune livraison à domicile planifiée pour cette date.</Alert>}
         </div>
       )}
 
