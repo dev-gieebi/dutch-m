@@ -1,10 +1,11 @@
-import { formatDate, Paginated } from '@/shared';
+import { formatDate, Paginated, Permission } from '@/shared';
 import { useQuery } from '@tanstack/react-query';
 import { ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { DataTable, EmptyState, Field, Modal, PageLoader, Pagination } from '@/admin/components/ui';
+import { Alert, DataTable, EmptyState, Field, Modal, PageLoader, Pagination } from '@/admin/components/ui';
 import { api } from '@/admin/lib/api';
+import { hasPermission, useAuthStore } from '@/admin/store/auth';
 import { AdminUser } from './types';
 
 interface AuditRow {
@@ -21,7 +22,16 @@ const ENTITY_LABELS: Record<string, string> = {
   stock_movement: 'Mouvement de stock',
 };
 
+// Réservé au super-administrateur (permission audit.read).
 export default function Audit() {
+  const user = useAuthStore((s) => s.user);
+  if (!hasPermission(user, Permission.AUDIT_READ)) {
+    return <Alert tone="error">Le journal d'audit est réservé au super-administrateur.</Alert>;
+  }
+  return <AuditLog />;
+}
+
+function AuditLog() {
   const [params, setParams] = useSearchParams();
   const [detail, setDetail] = useState<AuditRow | null>(null);
   const { data: users } = useQuery({ queryKey: ['users'], queryFn: () => api<AdminUser[]>('/admin/users') });
@@ -29,7 +39,7 @@ export default function Audit() {
     adminUserId: params.get('admin') ?? '', entityType: params.get('entityType') ?? '', action: params.get('action') ?? '',
     entityId: params.get('entityId') ?? '', from: params.get('from') ?? '', to: params.get('to') ?? '', page: Number(params.get('page') ?? 1), limit: 50,
   };
-  const { data, isLoading } = useQuery({ queryKey: ['audit', q], queryFn: () => api<Paginated<AuditRow>>('/admin/audit', { query: { ...q, adminUserId: q.adminUserId || undefined, entityType: q.entityType || undefined, action: q.action || undefined, entityId: q.entityId || undefined, from: q.from || undefined, to: q.to || undefined } }), placeholderData: (p) => p });
+  const { data, isLoading } = useQuery({ queryKey: ['audit', q], queryFn: () => api<Paginated<AuditRow>>('/admin/audit-logs', { query: { ...q, adminUserId: q.adminUserId || undefined, entityType: q.entityType || undefined, action: q.action || undefined, entityId: q.entityId || undefined, from: q.from || undefined, to: q.to || undefined } }), placeholderData: (p) => p });
   const set = (k: string, v: string) => {
     const n = new URLSearchParams(params);
     if (v) n.set(k, v); else n.delete(k);

@@ -305,7 +305,7 @@ export default function OrderDetail() {
         </select></Field>
         <Field label="Commentaire public (visible client)"><input className="input" value={String(form.publicComment ?? '')} onChange={(e) => setForm({ ...form, publicComment: e.target.value })} /></Field>
         <Field label="Note interne"><input className="input" value={String(form.internalNote ?? '')} onChange={(e) => setForm({ ...form, internalNote: e.target.value })} /></Field>
-        {user?.roles.includes('SUPER_ADMIN') && (
+        {(user?.roles.includes('SUPER_ADMIN') || user?.roles.includes('GERANT')) && (
           <label className="mt-1 flex items-start gap-2 text-xs"><input type="checkbox" className="mt-0.5 h-4 w-4 accent-gold" checked={!!form.force} onChange={(e) => setForm({ ...form, force: e.target.checked })} /> Forcer le saut d'étape (justification obligatoire)</label>
         )}
         {!!form.force && <Field label="Justification"><input className="input" value={String(form.justification ?? '')} onChange={(e) => setForm({ ...form, justification: e.target.value })} /></Field>}

@@ -20,6 +20,7 @@ use App\Services\NumberingService;
 use App\Services\Orders\TrackingService;
 use App\Support\AdminPrincipal;
 use App\Support\Domain;
+use App\Support\Format;
 use App\Support\Paginated;
 use App\Support\RequestMeta;
 use Illuminate\Support\Carbon;
@@ -58,7 +59,7 @@ class ArrivalsService
             'itemId' => $i->id,
             'orderId' => $i->order_id,
             'orderNumber' => $i->order->number,
-            'orderDate' => \App\Support\Format::iso($i->order->created_at),
+            'orderDate' => Format::iso($i->order->created_at),
             'customerName' => $i->order->contact_name,
             'productId' => $i->product_id,
             'productName' => $i->product_name,
@@ -283,8 +284,8 @@ class ArrivalsService
             throw new HttpException(400, 'Utilisez la réception pour pointer les quantités reçues');
         }
         $force = ! empty($dto['force']);
-        if ($force && (! $actor->isSuper() || trim($dto['justification'] ?? '') === '')) {
-            throw new HttpException(403, 'Seul un super-administrateur peut sauter une étape, avec une justification');
+        if ($force && (! $actor->isManager() || trim($dto['justification'] ?? '') === '')) {
+            throw new HttpException(403, 'Seul un super-administrateur ou un gérant peut sauter une étape, avec une justification');
         }
         $effects = new StockEffects;
         $notify = DB::transaction(function () use ($id, $dto, $actor, $force, $effects) {

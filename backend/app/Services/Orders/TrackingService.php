@@ -111,8 +111,8 @@ class TrackingService
     public function recordStep(int $shipmentId, array $dto, AdminPrincipal $actor, RequestMeta $meta): array
     {
         $force = ! empty($dto['force']);
-        if ($force && (! $actor->isSuper() || trim($dto['justification'] ?? '') === '')) {
-            throw new HttpException(403, 'Seul un super-administrateur peut sauter une étape, avec une justification');
+        if ($force && (! $actor->isManager() || trim($dto['justification'] ?? '') === '')) {
+            throw new HttpException(403, 'Seul un super-administrateur ou un gérant peut sauter une étape, avec une justification');
         }
         $effects = new StockEffects;
         $event = DB::transaction(function () use ($shipmentId, $dto, $actor, $force, $effects) {

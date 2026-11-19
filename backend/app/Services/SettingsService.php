@@ -95,6 +95,13 @@ class SettingsService
                 throw new HttpException(400, "Le délai d'expiration doit être compris entre 5 et 1440 minutes");
             }
         }
+        if ($key === 'theme' && is_array($value)) {
+            foreach ($value as $k => $color) {
+                if (! in_array($k, ['primary', 'secondary', 'background', 'text'], true) || ! is_string($color) || ! preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+                    throw new HttpException(400, 'Couleur invalide');
+                }
+            }
+        }
         if ($key === 'freeShippingThreshold' && $value !== null && (! $isNum($value) || $value < 0)) {
             throw new HttpException(400, 'Seuil de livraison gratuite invalide');
         }

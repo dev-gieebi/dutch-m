@@ -32,8 +32,17 @@ export interface PaymentSettings {
   expiryMinutes: number;
 }
 
+/** Couleurs de l'interface (hexadécimal #RRGGBB) ; les nuances sont dérivées côté client. */
+export interface ThemeSettings {
+  primary: string;
+  secondary: string;
+  background: string;
+  text: string;
+}
+
 export interface SettingsMap {
   shop: ShopInfo;
+  theme: ThemeSettings;
   whatsappNumber: string;
   supportHours: { label: string; slots: SupportSlot[] };
   currency: string;
@@ -58,6 +67,7 @@ export const DEFAULT_SETTINGS: SettingsMap = {
     city: 'Libreville',
     socials: { facebook: '', instagram: '', tiktok: '' },
   },
+  theme: { primary: '#D4A12A', secondary: '#E6BE5A', background: '#FCFAF5', text: '#2B2115' },
   whatsappNumber: '+24177270034',
   supportHours: {
     label: 'Du lundi au samedi, de 9 h à 18 h',
@@ -88,6 +98,7 @@ export const DEFAULT_SETTINGS: SettingsMap = {
 /** Clés exposées publiquement à la boutique. */
 export const PUBLIC_SETTING_KEYS: SettingKey[] = [
   'shop',
+  'theme',
   'whatsappNumber',
   'supportHours',
   'currency',

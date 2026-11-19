@@ -25,7 +25,7 @@ export default {
         sans: ['Montserrat', 'system-ui', 'sans-serif'],
       },
       backgroundImage: {
-        'gold-gradient': 'linear-gradient(135deg, #F2CF62 0%, #D4A12A 50%, #9A6712 100%)',
+        'gold-gradient': 'var(--gold-gradient)',
       },
       boxShadow: {
         soft: '0 4px 20px -8px rgba(43, 33, 21, 0.15)',

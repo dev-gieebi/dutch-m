@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Badge, EmptyState, PageLoader } from '@/admin/components/ui';
 import { api } from '@/admin/lib/api';
+import { themeColor } from '@/lib/theme';
 
 interface DashboardData {
   period: string;
@@ -24,7 +25,7 @@ interface DashboardData {
   latestMessages: { id: number; visitorName: string; status: string; unread: number; lastMessageAt: string; lastMessage: string | null }[];
 }
 
-const COLORS = ['#D4A12A', '#9A6712', '#E6BE5A', '#6E9F7B', '#E08A28', '#73634B'];
+const COLOR_VARS = ['gold', 'gold-dark', 'rose', 'success', 'warning', 'ink-soft'];
 const PERIODS = [['today', "Aujourd'hui"], ['7d', '7 jours'], ['30d', '30 jours']] as const;
 
 export default function Dashboard() {
@@ -32,6 +33,8 @@ export default function Dashboard() {
   const { data, isLoading } = useQuery({ queryKey: ['dashboard', period], queryFn: () => api<DashboardData>('/admin/dashboard', { query: { period } }), refetchInterval: 60_000 });
   if (isLoading || !data) return <PageLoader />;
   const { kpis, counters, charts } = data;
+  // Couleurs du thème courant (les attributs SVG n'acceptent pas les variables CSS).
+  const COLORS = COLOR_VARS.map(themeColor);
   const cards = [
     { label: "Chiffre d'affaires encaissé", value: formatFCFA(kpis.revenue), icon: Banknote },
     { label: 'Commandes', value: String(kpis.orders), icon: ShoppingCart },
@@ -80,11 +83,11 @@ export default function Dashboard() {
           <h2 className="mb-2 font-semibold">Ventes par jour</h2>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={charts.salesByDay.map((d) => ({ ...d, day: formatDate(d.day).split(' ').slice(0, 2).join(' ') }))}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#F2E9D6" />
+              <CartesianGrid strokeDasharray="3 3" stroke={themeColor('sand')} />
               <XAxis dataKey="day" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} tickFormatter={(v: number) => `${Math.round(v / 1000)}k`} />
               <Tooltip formatter={(v: number) => formatFCFA(v)} labelStyle={{ fontSize: 12 }} />
-              <Bar dataKey="amount" fill="#D4A12A" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="amount" fill={themeColor('gold')} radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

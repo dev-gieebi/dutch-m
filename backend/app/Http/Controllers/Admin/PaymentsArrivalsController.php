@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentRecordStatus;
+use App\Enums\Permission;
 use App\Enums\ShipmentStep;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryZone;
@@ -51,8 +52,8 @@ class PaymentsArrivalsController extends Controller
     public function manual(Request $request, int $id): JsonResponse
     {
         $actor = $this->admin($request);
-        if (! $actor->isSuper()) {
-            throw new HttpException(403, "Vous n'avez pas le rôle requis pour cette action");
+        if (! $actor->can(Permission::PAYMENTS_MANUAL->value)) {
+            throw new HttpException(403, "Vous n'avez pas les permissions nécessaires pour cette action");
         }
         $v = $request->validate([
             'amount' => ['required', 'integer', 'min:1'],

@@ -66,8 +66,8 @@ final class Domain
             ],
             RoleCode::GERANT->value => [
                 'name' => 'Gérant',
-                'description' => 'Tout sauf la gestion des super-administrateurs',
-                'permissions' => array_values(array_filter($all, fn ($p) => $p !== P::PAYMENTS_MANUAL->value)),
+                'description' => "Tous les droits sauf la gestion des utilisateurs et le journal d'audit",
+                'permissions' => array_values(array_filter($all, fn ($p) => ! in_array($p, [P::USERS_WRITE->value, P::AUDIT_READ->value], true))),
             ],
             RoleCode::CATALOGUE->value => [
                 'name' => 'Catalogue',

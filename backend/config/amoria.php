@@ -12,10 +12,11 @@ return [
     'admin_public_url' => rtrim(env('ADMIN_PUBLIC_URL', env('APP_URL', 'http://localhost:8000').'/admin'), '/'),
     'cors_origins' => array_values(array_filter(array_map('trim', explode(',', env('CORS_ORIGINS', 'http://localhost:5173'))))),
 
+    // Secret absent ou trop court (< 32 octets, refusé par firebase/php-jwt) : dérivé de APP_KEY, distinct par usage.
     'jwt' => [
-        'admin_secret' => env('JWT_ADMIN_ACCESS_SECRET'),
-        'customer_secret' => env('JWT_CUSTOMER_ACCESS_SECRET'),
-        'temp_secret' => env('JWT_TEMP_SECRET'),
+        'admin_secret' => strlen((string) env('JWT_ADMIN_ACCESS_SECRET')) >= 32 ? env('JWT_ADMIN_ACCESS_SECRET') : hash_hmac('sha256', 'jwt-admin', (string) env('APP_KEY')),
+        'customer_secret' => strlen((string) env('JWT_CUSTOMER_ACCESS_SECRET')) >= 32 ? env('JWT_CUSTOMER_ACCESS_SECRET') : hash_hmac('sha256', 'jwt-customer', (string) env('APP_KEY')),
+        'temp_secret' => strlen((string) env('JWT_TEMP_SECRET')) >= 32 ? env('JWT_TEMP_SECRET') : hash_hmac('sha256', 'jwt-temp', (string) env('APP_KEY')),
         'access_ttl' => (int) env('JWT_ACCESS_TTL', 900),
     ],
     'refresh_ttl_days' => (int) env('REFRESH_TTL_DAYS', 30),

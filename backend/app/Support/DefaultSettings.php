@@ -7,7 +7,7 @@ final class DefaultSettings
 {
     /** Clés exposées publiquement à la boutique. */
     public const PUBLIC_KEYS = [
-        'shop', 'whatsappNumber', 'supportHours', 'currency', 'payments', 'preorder', 'pickup', 'freeShippingThreshold', 'chat',
+        'shop', 'theme', 'whatsappNumber', 'supportHours', 'currency', 'payments', 'preorder', 'pickup', 'freeShippingThreshold', 'chat',
     ];
 
     public static function all(): array
@@ -23,6 +23,8 @@ final class DefaultSettings
                 'city' => 'Libreville',
                 'socials' => ['facebook' => '', 'instagram' => '', 'tiktok' => ''],
             ],
+            // Couleurs de l'interface (#RRGGBB) ; les nuances sont dérivées côté client.
+            'theme' => ['primary' => '#D4A12A', 'secondary' => '#E6BE5A', 'background' => '#FCFAF5', 'text' => '#2B2115'],
             'whatsappNumber' => '+24177270034',
             'supportHours' => [
                 'label' => 'Du lundi au samedi, de 9 h à 18 h',

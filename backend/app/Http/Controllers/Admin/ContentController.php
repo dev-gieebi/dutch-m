@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Permission;
 use App\Enums\ReviewStatus;
 use App\Http\Controllers\Controller;
 use App\Services\ContentService;
@@ -11,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /** Back-office : pages, FAQ, bannières, avis, tableau de bord, rapports et exports. */
 class ContentController extends Controller
@@ -183,6 +185,9 @@ class ContentController extends Controller
 
     public function export(Request $request, ReportsService $reports, string $entity): Response
     {
+        if ($entity === 'audit-logs' && ! $this->admin($request)->can(Permission::AUDIT_READ->value)) {
+            throw new HttpException(403, "Vous n'avez pas les permissions nécessaires pour cette action");
+        }
         $q = $request->validate(['format' => ['nullable', 'in:csv,xlsx'], 'from' => ['nullable', 'date'], 'to' => ['nullable', 'date']]);
         $format = $q['format'] ?? 'xlsx';
         $content = $reports->render($reports->table($entity, $q), $format);

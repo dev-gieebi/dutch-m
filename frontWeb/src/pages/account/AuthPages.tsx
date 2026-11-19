@@ -68,7 +68,9 @@ function Login() {
           setAdmin2fa({ tempToken: a.tempToken });
         }
         return setState({});
-      } catch { /* identifiants invalides des deux côtés */ }
+      } catch (err) {
+        return setState({ error: errorMessage(err) });
+      }
     }
     setState({ error: errorMessage(customerError) });
   };

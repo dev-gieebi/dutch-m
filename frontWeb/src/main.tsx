@@ -5,7 +5,11 @@ import { HelmetProvider } from 'react-helmet-async';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import { ApiError } from './lib/api';
+import { applyTheme, storedTheme } from './lib/theme';
 import './index.css';
+
+// Dernier thème connu, avant le premier rendu (évite le flash des couleurs par défaut).
+applyTheme(storedTheme(), false);
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -206,7 +206,7 @@ export default function Reports() {
 
       {tab === 'exports' && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          {EXPORTS.map((e) => (
+          {EXPORTS.filter((e) => e.entity !== 'audit-logs' || hasPermission(user, Permission.AUDIT_READ)).map((e) => (
             <div key={e.entity} className="card p-4">
               <p className="mb-3 font-semibold">{e.label}</p>
               {hasPermission(user, Permission.EXPORTS) ? (

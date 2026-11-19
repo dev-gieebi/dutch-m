@@ -28,6 +28,12 @@ final class AdminPrincipal
         return in_array(RoleCode::SUPER_ADMIN->value, $this->roles, true);
     }
 
+    /** Super-administrateur ou gérant : actions sensibles (saut d'étape justifié). */
+    public function isManager(): bool
+    {
+        return $this->isSuper() || in_array(RoleCode::GERANT->value, $this->roles, true);
+    }
+
     public function can(string $permission): bool
     {
         return $this->isSuper() || in_array($permission, $this->perms, true);

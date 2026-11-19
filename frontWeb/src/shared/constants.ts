@@ -55,8 +55,8 @@ export const ROLE_DEFINITIONS: Record<RoleCode, { name: string; description: str
   },
   [RoleCode.GERANT]: {
     name: 'Gérant',
-    description: 'Tout sauf la gestion des super-administrateurs',
-    permissions: ALL_PERMISSIONS.filter((p) => p !== P.PAYMENTS_MANUAL),
+    description: "Tous les droits sauf la gestion des utilisateurs et le journal d'audit",
+    permissions: ALL_PERMISSIONS.filter((p) => p !== P.USERS_WRITE && p !== P.AUDIT_READ),
   },
   [RoleCode.CATALOGUE]: {
     name: 'Catalogue',

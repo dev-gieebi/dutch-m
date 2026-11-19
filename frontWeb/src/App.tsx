@@ -3,7 +3,8 @@ import { Outlet, Route, Routes, useLocation } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { PageSkeleton } from './components/ui';
 import { refreshSession } from './lib/api';
-import { useCartSync } from './lib/hooks';
+import { useCartSync, useSettings } from './lib/hooks';
+import { applyTheme } from './lib/theme';
 import { useAuthStore } from './store/auth';
 
 const Home = lazy(() => import('./pages/Home'));
@@ -35,6 +36,8 @@ export default function App() {
   const { pathname } = useLocation();
   const hasSession = useAuthStore((s) => s.hasSession);
   useCartSync();
+  const theme = useSettings().data?.theme;
+  useEffect(() => { if (theme) applyTheme(theme); }, [theme]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   // Les balises SEO injectées par le serveur (data-ssr) ne valent que pour la première page affichée.
